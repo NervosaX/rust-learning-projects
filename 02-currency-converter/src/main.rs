@@ -26,9 +26,12 @@ impl Currency {
     }
 
     /// Convert one currency into another
-    fn convert_to_currency(&self, currency_amount: f32, currency: &Currency) -> f32 {
-        let as_usd = self.convert_to_usd(currency_amount);
-        as_usd / currency.ratio_of_usd
+    fn convert_to_currency(&'static self, currency: &Currency) -> impl Fn(f32) -> f32{
+        let ratio = currency.ratio_of_usd;
+        move |x| {
+            let as_usd = self.convert_to_usd(x);
+            as_usd / ratio
+        }
     }
 }
 
@@ -112,11 +115,13 @@ fn main() {
     let to = choose_currency("Choose a currency to convert to");
     let amount = get_number_from_buffer();
 
+    let convert_currency = from.convert_to_currency(to);
+
     println!(
         "\n{} {} is {} {}",
         amount,
         from.shortcode,
-        from.convert_to_currency(amount, to),
+        convert_currency(amount),
         to.shortcode
     )
 }
@@ -132,6 +137,7 @@ mod tests {
 
     #[test]
     fn it_converts_aud_to_jpy() {
-        assert_eq!((*AUD).convert_to_currency(200.0, &(*JPY)), 15824.175);
+        let convert_currency = AUD.convert_to_currency(&JPY);
+        assert_eq!(convert_currency(200.0), 15824.175);
     }
 }
