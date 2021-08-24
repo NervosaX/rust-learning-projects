@@ -27,16 +27,7 @@ fn main() {
     println!("Get the factorial of which number?");
 
     let num = get_number_from_buffer();
-
-    //let mut factorial = 1;
-    //
     let factorial = (1..=num).fold(1, |res, n| res * n);
-
-
-
-    //for n in 1..=num {
-    //    factorial *= n;
-    //}
 
     println!("Factorial: {}", factorial);
 }
